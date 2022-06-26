@@ -1,0 +1,204 @@
+<?php
+
+function oceanwp_child_enqueue_parent_style() {
+   wp_enqueue_style( 'child-style', get_stylesheet_directory_uri() . '/style.css', array( 'oceanwp-style' ), rand(111,9999) );
+}
+add_action( 'wp_enqueue_scripts', 'oceanwp_child_enqueue_parent_style' );
+
+
+// Register Custom Post Type
+function bbp_project_post_type() {
+
+	$labels = array(
+		'name'                  => _x( 'Projects', 'Post Type General Name', 'oceanwp' ),
+		'singular_name'         => _x( 'Project', 'Post Type Singular Name', 'oceanwp' ),
+		'menu_name'             => __( 'Projects', 'oceanwp' ),
+		'name_admin_bar'        => __( 'Project', 'oceanwp' ),
+		'archives'              => __( 'Item Archives', 'oceanwp' ),
+		'attributes'            => __( 'Item Attributes', 'oceanwp' ),
+		'parent_item_colon'     => __( 'Parent Item:', 'oceanwp' ),
+		'all_items'             => __( 'All Items', 'oceanwp' ),
+		'add_new_item'          => __( 'Add New Item', 'oceanwp' ),
+		'add_new'               => __( 'Add New', 'oceanwp' ),
+		'new_item'              => __( 'New Item', 'oceanwp' ),
+		'edit_item'             => __( 'Edit Item', 'oceanwp' ),
+		'update_item'           => __( 'Update Item', 'oceanwp' ),
+		'view_item'             => __( 'View Item', 'oceanwp' ),
+		'view_items'            => __( 'View Items', 'oceanwp' ),
+		'search_items'          => __( 'Search Item', 'oceanwp' ),
+		'not_found'             => __( 'Not found', 'oceanwp' ),
+		'not_found_in_trash'    => __( 'Not found in Trash', 'oceanwp' ),
+		'featured_image'        => __( 'Featured Image', 'oceanwp' ),
+		'set_featured_image'    => __( 'Set featured image', 'oceanwp' ),
+		'remove_featured_image' => __( 'Remove featured image', 'oceanwp' ),
+		'use_featured_image'    => __( 'Use as featured image', 'oceanwp' ),
+		'insert_into_item'      => __( 'Insert into item', 'oceanwp' ),
+		'uploaded_to_this_item' => __( 'Uploaded to this item', 'oceanwp' ),
+		'items_list'            => __( 'Items list', 'oceanwp' ),
+		'items_list_navigation' => __( 'Items list navigation', 'oceanwp' ),
+		'filter_items_list'     => __( 'Filter items list', 'oceanwp' ),
+	);
+	$args = array(
+		'label'                 => __( 'Project', 'oceanwp' ),
+		'description'           => __( 'Post Type Description', 'oceanwp' ),
+		'labels'                => $labels,
+		'supports'              => array( 'title', 'editor', 'thumbnail', 'revisions', 'excerpt' ),
+		'taxonomies'            => array( 'project-cat' ),
+		'hierarchical'          => false,
+		'public'                => true,
+		'show_ui'               => true,
+		'show_in_menu'          => true,
+		'menu_position'         => 5,
+		'show_in_admin_bar'     => true,
+		'show_in_nav_menus'     => false,
+		'can_export'            => true,
+		'has_archive'           => true,
+		'exclude_from_search'   => false,
+		'publicly_queryable'    => true,
+		'capability_type'       => 'post',
+	);
+	register_post_type( 'project', $args );
+
+}
+add_action( 'init', 'bbp_project_post_type', 0 );
+
+
+// Register Custom Taxonomy
+function bbp_project_cat_taxonomy() {
+
+	$labels = array(
+		'name'                       => _x( 'Categories', 'Taxonomy General Name', 'oceanwp' ),
+		'singular_name'              => _x( 'Category', 'Taxonomy Singular Name', 'oceanwp' ),
+		'menu_name'                  => __( 'Category', 'oceanwp' ),
+		'all_items'                  => __( 'All Items', 'oceanwp' ),
+		'parent_item'                => __( 'Parent Item', 'oceanwp' ),
+		'parent_item_colon'          => __( 'Parent Item:', 'oceanwp' ),
+		'new_item_name'              => __( 'New Item Name', 'oceanwp' ),
+		'add_new_item'               => __( 'Add New Item', 'oceanwp' ),
+		'edit_item'                  => __( 'Edit Item', 'oceanwp' ),
+		'update_item'                => __( 'Update Item', 'oceanwp' ),
+		'view_item'                  => __( 'View Item', 'oceanwp' ),
+		'separate_items_with_commas' => __( 'Separate items with commas', 'oceanwp' ),
+		'add_or_remove_items'        => __( 'Add or remove items', 'oceanwp' ),
+		'choose_from_most_used'      => __( 'Choose from the most used', 'oceanwp' ),
+		'popular_items'              => __( 'Popular Items', 'oceanwp' ),
+		'search_items'               => __( 'Search Items', 'oceanwp' ),
+		'not_found'                  => __( 'Not Found', 'oceanwp' ),
+		'no_terms'                   => __( 'No items', 'oceanwp' ),
+		'items_list'                 => __( 'Items list', 'oceanwp' ),
+		'items_list_navigation'      => __( 'Items list navigation', 'oceanwp' ),
+	);
+	$args = array(
+		'labels'                     => $labels,
+		'hierarchical'               => true,
+		'public'                     => true,
+		'show_ui'                    => true,
+		'show_admin_column'          => true,
+		'show_in_nav_menus'          => false,
+		'show_tagcloud'              => false,
+	);
+	register_taxonomy( 'project-cat', array( 'project' ), $args );
+
+}
+add_action( 'init', 'bbp_project_cat_taxonomy', 0 );
+
+
+function bbp_add_scripts_footer(){
+?>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.6/isotope.pkgd.min.js"></script>
+	<script>
+		// Project Filter
+		jQuery(window).on('load resize', function(){
+			var $grid = jQuery('.projects-wrapper').isotope();
+			jQuery('.projects-filter-wrapper').on( 'click', 'li', function() {
+			  	var filterValue = jQuery(this).attr('data-filter');
+			  	jQuery('.projects-filter-wrapper > li ').removeClass('active');
+				jQuery(this).addClass('active');
+			  	$grid.isotope({ filter: filterValue });
+			});
+		});
+	</script>
+<?php
+}
+add_action('wp_footer', 'bbp_add_scripts_footer');
+
+
+// Project Filter Shortcode
+function bbp_project_filter_shortcode($atts) {
+    extract( shortcode_atts(
+        array(
+            'item' => -1,
+        ), $atts )
+    );
+
+    ob_start();
+
+    $projectCategory = get_terms( array(
+	    'taxonomy' => 'project-cat',
+	    'hide_empty' => true
+	) );
+	 
+	if ( !empty($projectCategory) ) :
+	    $output = '<ul class="projects-filter-wrapper">';
+	    $output.= '<li class="active" data-filter="*">All</li>';
+	    foreach( $projectCategory as $projectCategoryItem ) {
+	        $output.= '<li data-filter=".'. esc_html($projectCategoryItem->slug) .'">'. esc_html( $projectCategoryItem->name ) .'</li>';
+	    }
+	    $output.='</ul>';
+	    echo $output;
+	endif;
+
+  	$projectQueryArg = array(
+  		'post_type' => 'project',
+  		'posts_per_page' => $item
+  	);
+	$projectQuery = new WP_Query( $projectQueryArg );
+	?>
+	<div class="projects-wrapper">
+		<?php
+		if ( $projectQuery->have_posts() ) {
+			while ( $projectQuery->have_posts() ) {
+		      	$projectQuery->the_post();
+
+				global $post;
+				$get_term_slugs = array();
+				$cgTeacherTerms = get_the_terms( get_the_ID() , array( 'project-cat') );
+				foreach ( $cgTeacherTerms as $cgTeacherTerm ) {
+				 	$get_term_slugs[] = $cgTeacherTerm->slug;
+				}
+				?>
+				<div class="project-item <?php echo join(' ', $get_term_slugs ); ?> ">
+					<?php $projectImg = wp_get_attachment_image_src( get_post_thumbnail_id( get_the_ID() ), 'full' ); ?>
+					<div class="project-item-inner" style="background-image: url(<?php echo $projectImg[0]; ?>);">
+						<div class="project-item-details">
+							<div class="project-item-title"><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></div>
+							<div class="project-item-excerpt"><?php the_excerpt(); ?></div>
+							<ul class="project-item-meta">
+								<li class="project-item-lightbox"><a class="no-lightbox" href="<?php echo $projectImg[0]; ?>"><i class="fas fa-search-plus" aria-hidden="true"></i></a></li>
+								<li class="project-item-viewmore"><a href="<?php the_permalink(); ?>"><i class="fas fa-link" aria-hidden="true"></i></a></li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			<?php
+			} // end while
+		} // endif
+		?>
+	</div>
+	<?php
+	wp_reset_postdata();
+
+  return ob_get_clean();
+}
+add_shortcode( 'bbp_project_filter', 'bbp_project_filter_shortcode' );
+
+
+function template_layout_full_width( $class ) {
+	// Alter your layout
+	if ( is_singular( 'project' ) ) {
+		$class = 'full-width';
+	}
+	// Return correct class
+	return $class;
+}
+add_filter( 'ocean_post_layout_class', 'template_layout_full_width', 20 );
